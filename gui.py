@@ -2,8 +2,7 @@ import tkinter as tkin
 import PIL
 from PIL import ImageTk
 from PIL import Image
-import random
-import os.path
+import random import os.path
 
 
 
@@ -270,6 +269,7 @@ class Piece(object):
         col6 = range(5, 62, +8)
         col7 = range(6, 63, +8)
         col8 = range(7, 64, +8)
+
 
         def unbindAll(self):
                 pass
@@ -2003,6 +2003,16 @@ def doMove(event,origSquare,possibleMoves):
                 else:
                         pickPiece(setMove,places,origSquare)
 
+        if piece.kind == "rook":
+                if piece.color == "w":
+                        if pIndex in row1:
+                                winLose(otherPiece)
+                        else:
+                                Lose(otherPiece)
+                                
+
+                                
+                
 
         #change round label
         global moveNo
@@ -2021,6 +2031,7 @@ def doMove(event,origSquare,possibleMoves):
 
         #run pickPiece function
         pickPiece(setMove,places,origSquare)
+        
 
 
 
@@ -2029,7 +2040,7 @@ def setStartPosition(bSet,wSet,board,boardObjectSpaces):
         #starting positions
         #sets hold the objects
         #black
-        for num in range(0,16):
+        for num in range(0,1):
                 piece = bSet[num]
                 boardObjectSpaces[num] = piece
                 display = bSet[num].bImage
@@ -2038,8 +2049,11 @@ def setStartPosition(bSet,wSet,board,boardObjectSpaces):
                 bPlaces[num] = piece
 
         #white
+        
+                
+
         setCounter = 0
-        for num in range(63,47,-1):
+        for num in range(63,61,-1):
                 piece = wSet[setCounter]
                 boardObjectSpaces[num] = piece
                 display = wSet[setCounter].wImage
@@ -2049,6 +2063,37 @@ def setStartPosition(bSet,wSet,board,boardObjectSpaces):
 
         return bSet,wSet,board,bPlaces,wPlaces,boardObjectSpaces
 
+
+
+def Lose(otherPiece):
+        #if king dies
+
+        popup = tkin.Tk()
+        popup.geometry("1000x800")
+
+        popup.wm_title("Wrong Move try again!!!")
+
+        label = tkin.Label(popup, font=("Helvetica", 100))
+
+        if otherPiece.color == "b":
+                #white wins
+                msg = "White Wins!!"
+                popup.config(bg="white")
+                label.config(bg="white", fg="black")
+
+        if otherPiece.color == "w":
+                #black wins
+                msg = "Black Wins!!"
+                popup.config(bg="black")
+                label.config(bg="black", fg="white")
+
+
+        label.config(text=msg)
+
+
+        label.pack()
+
+        popup.mainloop()
 
 def pickPiece(setMove,places,origSquare):
         #undo last time
@@ -2084,7 +2129,6 @@ def pickPiece(setMove,places,origSquare):
                     #if space has no piece then loop back
                     continue
 
-        #return places so we can clear them for the next time around
         return places
 
 def playerSelect(event,places):
@@ -2190,7 +2234,7 @@ def winLose(otherPiece):
         popup = tkin.Tk()
         popup.geometry("1000x800")
 
-        popup.wm_title("You WIN!!!")
+        popup.wm_title("Good Job you found mate in 1!!!")
 
         label = tkin.Label(popup, font=("Helvetica", 100))
 
@@ -2312,40 +2356,15 @@ def promote(event,piece,origSquare,possibleMoves):
 #16 total in each set
 #laid out in their starting order so they are instaniated that way inside their set and boardObjectSpaces
 #black objects
-bRook1 = Rook("b",bSet)
-bKnight1 = Knight("b",bSet)
-bBishop1 = Bishop("b",bSet)
-bQueen = Queen("b",bSet)
+
 bKing = King("b",bSet)
-bBishop2 = Bishop("b",bSet)
-bKnight2 = Knight("b",bSet)
-bRook2 = Rook("b",bSet)
-bPawn1 = Pawn("b",bSet)
-bPawn2 = Pawn("b",bSet)
-bPawn3 = Pawn("b",bSet)
-bPawn4 = Pawn("b",bSet)
-bPawn5 = Pawn("b",bSet)
-bPawn6 = Pawn("b",bSet)
-bPawn7 = Pawn("b",bSet)
-bPawn8 = Pawn("b",bSet)
+
 
 #white objects
 wRook1 = Rook("w",wSet)
-wKnight1 = Knight("w",wSet)
-wBishop1 = Bishop("w",wSet)
-wKing = King("w",wSet)
-wQueen = Queen("w",wSet)
-wBishop2 = Bishop("w",wSet)
-wKnight2 = Knight("w",wSet)
+
 wRook2 = Rook("w",wSet)
-wPawn1 = Pawn("w",wSet)
-wPawn2 = Pawn("w",wSet)
-wPawn3 = Pawn("w",wSet)
-wPawn4 = Pawn("w",wSet)
-wPawn5 = Pawn("w",wSet)
-wPawn6 = Pawn("w",wSet)
-wPawn7 = Pawn("w",wSet)
-wPawn8 = Pawn("w",wSet)
+
 
 #print(wSet)
 
@@ -2386,7 +2405,26 @@ playerGo = playerLabel(playerGo)
 blackSquares,whiteSquares = makeBoardCanvases()
 blackSquares,whiteSquares = positionBoardCanvases(blackSquares,whiteSquares)
 board = boardSpaces(blackSquares,whiteSquares)
-bSet,wSet,board,bPlaces,wPlaces,boardObjectSpaces = setStartPosition(bSet,wSet,board,boardObjectSpaces)
+
+piece = bSet[0]
+boardObjectSpaces[3] = piece
+display = bSet[0].bImage
+place = board[3].create_image(35,35,image=display)
+bPlaces[3] = piece
+
+piece = wSet[0]
+boardObjectSpaces[56] = piece
+display = wSet[0].wImage
+place = board[56].create_image(35,35,image=display)
+wPlaces[56] = piece
+
+piece = wSet[1]
+boardObjectSpaces[15] = piece
+display = wSet[1].wImage
+place = board[15].create_image(35,35,image=display)
+wPlaces[15] = piece
+
+
 places = pickPiece(setMove,places,origSquare=board[1])
 
 #print(bPlaces)
