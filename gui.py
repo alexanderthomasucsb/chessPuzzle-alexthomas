@@ -2,7 +2,8 @@ import tkinter as tkin
 import PIL
 from PIL import ImageTk
 from PIL import Image
-import random import os.path
+import random 
+import os.path
 
 
 
@@ -1906,7 +1907,7 @@ def doMove(event,origSquare,possibleMoves):
             #delete from old Canvas
             board[oldIndex].delete("all")
             #move to new Canvas
-            board[newIndex].create_image(30, 30, image=img)
+            board[newIndex].create_image(50, 50, image=img)
             #move object
             boardObjectSpaces[newIndex] = boardObjectSpaces[oldIndex]
             #delete object from old space/give it empty space
@@ -1931,7 +1932,7 @@ def doMove(event,origSquare,possibleMoves):
                 # remove from Canvas in board
                 board[newIndex].delete("all")
                 # put new piece in canvas
-                board[newIndex].create_image(30, 30, image=img)
+                board[newIndex].create_image(50, 50, image=img)
                 #remove killer from their previous space
                 board[oldIndex].delete("all")
 
@@ -1967,10 +1968,10 @@ def doMove(event,origSquare,possibleMoves):
                 # swap spaces in board Canvases
                 #other piece
                 board[oldIndex].delete("all")
-                board[oldIndex].create_image(30, 30, image=otherImg)
+                board[oldIndex].create_image(50, 50, image=otherImg)
                 #player's piece
                 board[newIndex].delete("all")
-                board[newIndex].create_image(30, 30, image=img)
+                board[newIndex].create_image(50, 50, image=img)
 
                 # swap spaces in boardObjectSpaces
                 boardObjectSpaces[oldIndex] = otherPiece
@@ -2003,16 +2004,6 @@ def doMove(event,origSquare,possibleMoves):
                 else:
                         pickPiece(setMove,places,origSquare)
 
-        if piece.kind == "rook":
-                if piece.color == "w":
-                        if pIndex in row1:
-                                winLose(otherPiece)
-                        else:
-                                Lose(otherPiece)
-                                
-
-                                
-                
 
         #change round label
         global moveNo
@@ -2031,7 +2022,6 @@ def doMove(event,origSquare,possibleMoves):
 
         #run pickPiece function
         pickPiece(setMove,places,origSquare)
-        
 
 
 
@@ -2040,60 +2030,66 @@ def setStartPosition(bSet,wSet,board,boardObjectSpaces):
         #starting positions
         #sets hold the objects
         #black
-        for num in range(0,1):
+        for num in range(0,16):
                 piece = bSet[num]
                 boardObjectSpaces[num] = piece
                 display = bSet[num].bImage
-                place = board[num].create_image(35,35,image=display)
+                place = board[num].create_image(45,45,image=display)
                 ########this is making a one when it should be storing an object
                 bPlaces[num] = piece
 
         #white
-        
-                
-
         setCounter = 0
-        for num in range(63,61,-1):
+        for num in range(63,47,-1):
                 piece = wSet[setCounter]
                 boardObjectSpaces[num] = piece
                 display = wSet[setCounter].wImage
-                place = board[num].create_image(35,35,image=display)
+                place = board[num].create_image(45,45,image=display)
                 wPlaces[num] = piece
                 setCounter+=1
 
         return bSet,wSet,board,bPlaces,wPlaces,boardObjectSpaces
 
+columnLetterToCoord = {'a': 0,'b' : 1,'c' : 2,'d' : 3,'e' : 4,'f' : 5,'g' : 6,'h' : 7 }
 
 
-def Lose(otherPiece):
-        #if king dies
-
-        popup = tkin.Tk()
-        popup.geometry("1000x800")
-
-        popup.wm_title("Wrong Move try again!!!")
-
-        label = tkin.Label(popup, font=("Helvetica", 100))
-
-        if otherPiece.color == "b":
-                #white wins
-                msg = "White Wins!!"
-                popup.config(bg="white")
-                label.config(bg="white", fg="black")
-
-        if otherPiece.color == "w":
-                #black wins
-                msg = "Black Wins!!"
-                popup.config(bg="black")
-                label.config(bg="black", fg="white")
+def puzzleNotationToCoord(puzzleNotationList):
+    tempArray = []
+    for place in puzzleNotationList:
+        coord = (8-int(place[2]))*8 + columnLetterToCoord[place[1]]
+        tempArray.append(place[0]+ str(coord))
+    return tempArray
+        
 
 
-        label.config(text=msg)
 
 
-        label.pack()
 
-        popup.mainloop()
+def setUpFromFile():
+    #opens puzzle text file and turns it into a string
+    text_file = open("/Users/alexanderthomas/Desktop/passionProject-alexthomas/puzzle1.txt", "r")
+    puzzle = text_file.read()
+    text_file.close()
+
+    #seperates the puzzle string into arrrays containing the black pieces setup, white pieces set up and the solution
+    x=puzzle.split("\n")
+    bSetUp = x[0][3:].split(',')
+    wSetUp = x[1][3:].split(',')
+    solution = x[2][3:].split(',')
+
+    pieceInSetArray = {'r' : 0, 'n': 2, 'b':4, 'q' : 5, 'k':6, 'p':7 }
+    
+    bSetUpCoord = puzzleNotationToCoord(bSetUp)
+
+    for piecePos in bSetUpCoord:
+        pieceCoord = piecePos[1:]
+        piece = bSet[pieceInSetArray[piecePos[0]]]
+        boardObjectSpaces[pieceCoord] = piece
+        display = bSet[pieceInSetArray[piecePos[0]]].bImage
+        place = board[pieceCoord].create_image(45,45,image=display)
+        ########this is making a one when it should be storing an object
+        bPlaces[pieceCoord] = piece 
+
 
 def pickPiece(setMove,places,origSquare):
         #undo last time
@@ -2129,6 +2125,7 @@ def pickPiece(setMove,places,origSquare):
                     #if space has no piece then loop back
                     continue
 
+        #return places so we can clear them for the next time around
         return places
 
 def playerSelect(event,places):
@@ -2234,7 +2231,7 @@ def winLose(otherPiece):
         popup = tkin.Tk()
         popup.geometry("1000x800")
 
-        popup.wm_title("Good Job you found mate in 1!!!")
+        popup.wm_title("You WIN!!!")
 
         label = tkin.Label(popup, font=("Helvetica", 100))
 
@@ -2320,7 +2317,7 @@ def promote(event,piece,origSquare,possibleMoves):
                         boardObjectSpaces[pIndex] = wNew[wLevel]
                         #delete old pawn from board canvas
                         board[pIndex].delete("all")
-                        board[pIndex].create_image(30,30,image = wNew[wLevel].wImage)
+                        board[pIndex].create_image(50,50,image = wNew[wLevel].wImage)
                         #delete old pawn from set
                         wPlaces[pIndex] = ""
                         wPlaces[pIndex] = wNew[wLevel]
@@ -2339,7 +2336,7 @@ def promote(event,piece,origSquare,possibleMoves):
                         boardObjectSpaces[pIndex] = bNew[bLevel]
                         # delete old pawn from board canvas
                         board[pIndex].delete("all")
-                        board[pIndex].create_image(30, 30, image=bNew[bLevel].bImage)
+                        board[pIndex].create_image(50, 50, image=bNew[bLevel].bImage)
                         # delete old pawn from set
                         print("PINDEXX",pIndex)
                         bPlaces[pIndex] = ""
@@ -2356,15 +2353,40 @@ def promote(event,piece,origSquare,possibleMoves):
 #16 total in each set
 #laid out in their starting order so they are instaniated that way inside their set and boardObjectSpaces
 #black objects
-
+bRook1 = Rook("b",bSet)
+bRook2 = Rook("b",bSet)
+bKnight1 = Knight("b",bSet)
+bKnight2 = Knight("b",bSet)
+bBishop1 = Bishop("b",bSet)
+bBishop2 = Bishop("b",bSet)
+bQueen = Queen("b",bSet)
 bKing = King("b",bSet)
-
+bPawn1 = Pawn("b",bSet)
+bPawn2 = Pawn("b",bSet)
+bPawn3 = Pawn("b",bSet)
+bPawn4 = Pawn("b",bSet)
+bPawn5 = Pawn("b",bSet)
+bPawn6 = Pawn("b",bSet)
+bPawn7 = Pawn("b",bSet)
+bPawn8 = Pawn("b",bSet)
 
 #white objects
 wRook1 = Rook("w",wSet)
-
 wRook2 = Rook("w",wSet)
-
+wKnight1 = Knight("w",wSet)
+wKnight2 = Knight("w",wSet)
+wBishop1 = Bishop("w",wSet)
+wBishop2 = Bishop("w",wSet)
+wKing = King("w",wSet)
+wQueen = Queen("w",wSet)
+wPawn1 = Pawn("w",wSet)
+wPawn2 = Pawn("w",wSet)
+wPawn3 = Pawn("w",wSet)
+wPawn4 = Pawn("w",wSet)
+wPawn5 = Pawn("w",wSet)
+wPawn6 = Pawn("w",wSet)
+wPawn7 = Pawn("w",wSet)
+wPawn8 = Pawn("w",wSet)
 
 #print(wSet)
 
@@ -2389,6 +2411,12 @@ def fillPlaces(wPlaces,bPlaces):
 moveNo = 0
 playerGo = "It's white's move"
 setMove = "w"
+
+#open text file with puzzle placements and solution and make it into a string
+text_file = open("/Users/alexanderthomas/Desktop/passionProject-alexthomas/puzzle1.txt", "r")
+puzzle = text_file.read()
+text_file.close()
+
 #DON'T CONFUSE SETS AND PLACES
 wPlaces = []
 bPlaces = []
@@ -2405,26 +2433,7 @@ playerGo = playerLabel(playerGo)
 blackSquares,whiteSquares = makeBoardCanvases()
 blackSquares,whiteSquares = positionBoardCanvases(blackSquares,whiteSquares)
 board = boardSpaces(blackSquares,whiteSquares)
-
-piece = bSet[0]
-boardObjectSpaces[3] = piece
-display = bSet[0].bImage
-place = board[3].create_image(35,35,image=display)
-bPlaces[3] = piece
-
-piece = wSet[0]
-boardObjectSpaces[56] = piece
-display = wSet[0].wImage
-place = board[56].create_image(35,35,image=display)
-wPlaces[56] = piece
-
-piece = wSet[1]
-boardObjectSpaces[15] = piece
-display = wSet[1].wImage
-place = board[15].create_image(35,35,image=display)
-wPlaces[15] = piece
-
-
+bSet,wSet,board,bPlaces,wPlaces,boardObjectSpaces = setStartPosition(bSet,wSet,board,boardObjectSpaces)
 places = pickPiece(setMove,places,origSquare=board[1])
 
 #print(bPlaces)
@@ -2486,6 +2495,4 @@ places = pickPiece(setMove,places,origSquare=board[1])
 #[["w",1],["b",1],]
 
 #main
-
-
 root.mainloop()
