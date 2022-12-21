@@ -28,9 +28,17 @@ def setUpFromFile():
     wSetUp = x[1][3:].split(',')
     solution = x[2][3:].split(',')
 
-    
-    bSetupCoord = puzzleNotationToCoord(bSetUp)
-    print(bSetupCoord)
+    pieceInSetArray = {'r' : 0, 'n': 2, 'b':4, 'q' : 5, 'k':6, 'p':7 }
+    bSetUpCoord = puzzleNotationToCoord(bSetUp)
+    for piece in bSetUpCoord:
+       piece = bSet[num]
+                boardObjectSpaces[num] = piece
+                display = bSet[num].bImage
+                place = board[num].create_image(45,45,image=display)
+                ########this is making a one when it should be storing an object
+                bPlaces[num] = piece 
+
+
 
 
 
