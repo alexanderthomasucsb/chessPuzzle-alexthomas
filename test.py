@@ -7,9 +7,11 @@ columnLetterToCoord = {'a': 0,'b' : 1,'c' : 2,'d' : 3,'e' : 4,'f' : 5,'g' : 6,'h
 def puzzleNotationToCoord(puzzleNotationList):
     tempArray = []
     for place in puzzleNotationList:
-        coord = (8-int(place[2]))*8 + columnLetterToCoord[place[1]]
+        coord = (8-int(place[3]))*8 + columnLetterToCoord[place[2]]
         tempArray.append(place[0]+ str(coord))
     return tempArray
+
+
         
 
 
