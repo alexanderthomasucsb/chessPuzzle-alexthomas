@@ -1,9 +1,11 @@
+from ast import Nonlocal
 import tkinter as tkin
 import PIL
 from PIL import ImageTk
 from PIL import Image
 import random 
 import os.path
+import random
 
 
 
@@ -14,6 +16,8 @@ root.geometry("1300x1000")
 header = tkin.Label(root,text="2D Chess",)
 header.config(font=("courier",20))
 header.grid(column=0,row=0)
+
+files = { 1:"/Users/alexanderthomas/Desktop/passionProject-alexthomas/puzzle1.txt", 2: "/Users/alexanderthomas/Desktop/passionProject-alexthomas/puzzle2.txt", 3: "/Users/alexanderthomas/Desktop/passionProject-alexthomas/puzzle3.txt" }
 
 def roundLabel():
         global moveNo
@@ -161,6 +165,58 @@ def positionBoardCanvases(blackSquares,whiteSquares):
             wCol+=2
             blackSquares[num].grid(column=bCol,row=8)
             whiteSquares[num].grid(column=wCol,row=8)
+        
+        resetButton = tkin.Canvas(root, width=180,height=90,border=0,bg="lightblue",cursor="hand2")
+        resetButton.grid(column = 9, row = 3)
+        text_x, text_y = 90, 45
+        resetButton.create_text(text_x, text_y, text="Reset Puzzle", font=("Arial", 16), fill="black")
+
+        nextButton = tkin.Canvas(root, width=180,height=90,border=0,bg="green",cursor="hand2")
+        nextButton.grid(column = 10, row = 3)
+        text_x, text_y = 90, 45
+        nextButton.create_text(text_x, text_y, text="Next Puzzle", font=("Arial", 16), fill="black")
+
+        def onResetClick(event):
+                x = event.x
+                y = event.y
+                print(f"Reset Clicked!")
+                resetPuzzle()
+
+        def onNextClick(event):
+                x = event.x
+                y = event.y
+                print(f"Next Clicked!")
+                global solution
+                global board
+                global bSet
+                global wSet
+                global bPlaces
+                global wPlaces
+                global boardObjectSpaces
+                global places
+
+                for newIndex in range(64):
+                        board[newIndex].delete("all")
+                
+
+                for i in range(64):
+                        boardObjectSpaces[i] = ''
+                wPlaces = []
+                bPlaces = []
+                places = ""
+                wPlaces,bPlaces = fillPlaces(wPlaces,bPlaces)
+                bSet,wSet,board,bPlaces,wPlaces,boardObjectSpaces,solution = setUpFromRandomFile(bSet,wSet,board,boardObjectSpaces)
+                places = pickPiece(setMove,places,origSquare=board[1])
+
+        
+
+        resetButton.bind("<Button-1>", onResetClick)
+        nextButton.bind("<Button-1>", onNextClick)
+
+
+        
+
+        # Draw a rounded rectangle on the canvas
 
         return blackSquares,whiteSquares
 
@@ -1816,12 +1872,209 @@ class King(Piece):
 
 
 #MOVING
+
+def resetPuzzle():
+        global solution
+        global board
+        global bSet
+        global wSet
+        global bPlaces
+        global wPlaces
+        global boardObjectSpaces
+        global places
+
+        for newIndex in range(64):
+                board[newIndex].delete("all")
+        
+
+        for i in range(64):
+                boardObjectSpaces[i] = ''
+        wPlaces = []
+        bPlaces = []
+        places = ""
+        wPlaces,bPlaces = fillPlaces(wPlaces,bPlaces)
+        bSet,wSet,board,bPlaces,wPlaces,boardObjectSpaces,solution = setUpFromFile(bSet,wSet,board,boardObjectSpaces)
+        places = pickPiece(setMove,places,origSquare=board[1])
+
+
+def autoMove():
+        global solution
+        global playerGo
+        print("autoMove line 2559")
+
+        if len(solution) == 0:
+                playerGo = "You solved the puzzle!"
+                playerText = tkin.Label(root, text=playerGo)
+                playerText.grid(column=9, row=0)
+                return
+
+        #Canvases
+        oldSquareCoords = int((8-int(solution[0][3]))*8 + columnLetterToCoord[solution[0][2]])
+        newSquareCoords = int((8-int(solution[0][5]))*8 + columnLetterToCoord[solution[0][4]])
+
+        origSquare = board[oldSquareCoords]
+        newSquare = board[newSquareCoords]
+        
+       
+        
+
+        #TO DO:change so only runs if new square matches solution
+
+        print("auto newSquare: ", newSquareCoords )
+        print("auto origSquare: ", oldSquareCoords )
+
+        #indexes
+        oldIndex = board.index(origSquare)
+        newIndex = board.index(newSquare)
+
+        
+        #objects
+        piece = boardObjectSpaces[oldIndex]
+        otherPiece = boardObjectSpaces[newIndex]
+
+        if piece != "": 
+                print("picked piece: ", piece.color, piece)
+        if otherPiece != "":
+                print("attacked piece: ", otherPiece.color, otherPiece)
+
+        #set object
+        #and get correct image
+        #and determine who's turn it is after ours by getting our color
+        if piece == "":
+                pass
+        elif piece.color == "w":
+                ourSetPiece = wPlaces[oldIndex]
+                ourColor = "w"
+                turn = "b"
+                img = boardObjectSpaces[oldIndex].wImage
+        elif piece.color == "b":
+                ourSetPiece = bPlaces[oldIndex]
+                ourColor = "b"
+                turn = "w"
+                img = boardObjectSpaces[oldIndex].bImage
+
+        #other set object
+        if otherPiece == "":
+                pass
+        elif otherPiece.color == "w":
+                otherSetPiece = wPlaces[newIndex]
+                otherColor = "w"
+                otherImg = boardObjectSpaces[newIndex].wImage
+        elif otherPiece.color == "b":
+                otherSetPiece = bPlaces[oldIndex]
+                otherColor = "b"
+                otherImg = boardObjectSpaces[newIndex].bImage
+
+
+
+        
+
+        #parameter to pass to pickPieces. Allows other player to have their turn
+
+        # moving to new square Canvas
+        # board[newIndex].delete("all")
+        # board[newIndex].create_image(50, 50, image=img)
+
+        # need to kill opposing player and swap with same color player
+        # then switch the turns over
+        if otherPiece == "":
+                # if nothing in square
+
+                #delete from old Canvas
+                board[oldIndex].delete("all")
+                #move to new Canvas
+                board[newIndex].create_image(50, 50, image=img)
+                #move object
+                boardObjectSpaces[newIndex] = boardObjectSpaces[oldIndex]
+                #delete object from old space/give it empty space
+                boardObjectSpaces[oldIndex] = ""
+                #move set object
+        if ourColor == "w":
+                wPlaces[newIndex] = wPlaces[oldIndex]
+                wPlaces[oldIndex] = ""
+        elif ourColor == "b":
+                bPlaces[newIndex] = bPlaces[oldIndex]
+                bPlaces[oldIndex] = ""
+
+        #run pickPiece function passing in other player's color
+        #pickPiece(setMove,places)
+
+        if otherPiece != "":
+                if otherPiece.color == turn:
+                        print("kill other line 1940")
+                        # if opposing player kill it
+
+                        # otherpiece is the object
+
+                        # remove from Canvas in board
+                        board[newIndex].delete("all")
+                        # put new piece in canvas
+                        board[newIndex].create_image(50, 50, image=img)
+                        #remove killer from their previous space
+                        board[oldIndex].delete("all")
+
+                        # remove from object spaces
+                        #replace it with the player piece and put an empty string in the previous place. The otherPiece is gone
+                        boardObjectSpaces[newIndex] = piece
+                        boardObjectSpaces[oldIndex] = ""
+
+                        # remove from player set but do so by replacing it with an empty string
+                        #don't use 'remove' etc. otherwise that will remove a space and mess up its correlation to the board
+                        if turn == "w":
+                                bPlaces[newIndex] = ""
+                                # change killer's space in their set
+                                wPlaces[newIndex] = piece
+                                wPlaces[oldIndex] = ""
+                        elif turn == "b":
+                                bPlaces[newIndex] = ""
+                                # change killer's space in their set
+                                wPlaces[newIndex] = piece
+                                wPlaces[oldIndex] = ""
+
+
+                        if otherPiece.kind == "king":
+                                #if the king dies run the winlose function and end the game
+                                winLose(otherPiece)
+                        #else:
+                                #pickPiece function
+                                #pickPiece(setMove,places)
+
+                elif otherPiece.color == ourColor:
+                        # if same set piece then swap it
+
+                        # swap spaces in board Canvases
+                        #other piece
+                        board[oldIndex].delete("all")
+                        board[oldIndex].create_image(50, 50, image=otherImg)
+                        #player's piece
+                        board[newIndex].delete("all")
+                        board[newIndex].create_image(50, 50, image=img)
+
+                        # swap spaces in boardObjectSpaces
+                        boardObjectSpaces[oldIndex] = otherPiece
+                        boardObjectSpaces[newIndex] = piece
+
+                        # swap spaces in player set
+                        if ourColor == "w":
+                                wPlaces[oldIndex] = otherPiece
+                                wPlaces[newIndex] = piece
+                        elif ourColor == "b":
+                                bPlaces[oldIndex] = otherPiece
+                                bPlaces[newIndex] = piece
+        solution = solution[1:]
+        
+
+
+
+
 def doMove(event,origSquare,possibleMoves):
-        print("DOMOVE line 1819")
+        global solution
+        print("DOMOVE line 1981")
 
         #Canvases
         newSquare = event.widget
         origSquare = origSquare
+        print("orig square: ", origSquare)
         newSquareCoords = 0
         for i in board:
                 if i == newSquare:
@@ -1854,7 +2107,10 @@ def doMove(event,origSquare,possibleMoves):
         #set object
         #and get correct image
         #and determine who's turn it is after ours by getting our color
-        if piece.color == "w":
+        print("testing: ", piece)
+        if piece == "":
+                pass
+        elif piece.color == "w":
                 ourSetPiece = wPlaces[oldIndex]
                 ourColor = "w"
                 turn = "b"
@@ -1915,7 +2171,7 @@ def doMove(event,origSquare,possibleMoves):
         # set object
 
         #parameter to pass to pickPieces. Allows other player to have their turn
-        setMove = turn
+        setMove = "b"
 
         # moving to new square Canvas
         # board[newIndex].delete("all")
@@ -2011,10 +2267,7 @@ def doMove(event,origSquare,possibleMoves):
 
         ###################promote pawns
 
-        print("PIECE",piece)
-
-        print("row1",row1)
-
+        
         pIndex = boardObjectSpaces.index(piece)
 
         if piece.kind == "pawn":
@@ -2028,7 +2281,7 @@ def doMove(event,origSquare,possibleMoves):
                         pickPiece(setMove,places,origSquare)
 
 
-        print("changes to check against solution 2032")
+        print("check solution check: ", solution)
 
         correctMove = int((8-int(solution[0][5]))*8 + columnLetterToCoord[solution[0][4]])
         print('correctMove: ', correctMove)
@@ -2037,6 +2290,14 @@ def doMove(event,origSquare,possibleMoves):
                 print("correct")
                 solution = solution[1:]
                 autoMove()
+                if len(solution) == 0:
+                        return
+        else:
+                playerGo = "Wrong move. Try again!"
+                playerText = tkin.Label(root, text=playerGo)
+                playerText.grid(column=9, row=0)
+                resetPuzzle()
+
 
         #change round label
         global moveNo
@@ -2054,7 +2315,7 @@ def doMove(event,origSquare,possibleMoves):
 
 
         #run pickPiece function
-        pickPiece(setMove,places,origSquare)
+        pickPiece('w',places,origSquare)
         
 
 
@@ -2095,15 +2356,59 @@ def puzzleNotationToCoord(puzzleNotationList):
         
 
 
+def setUpFromRandomFile(bSet,wSet,board,boardObjectSpaces):
+        global puzzle
+        randNum = random.randint(1, 3)
+        text_file = open(files[randNum], "r")
+        print(text_file)
+        puzzle = text_file.read()
+        text_file.close()
+
+        #seperates the puzzle string into arrrays containing the black pieces setup, white pieces set up and the solution
+        x=puzzle.split("\n")
+        bSetUp = x[0][3:].split(',')
+        wSetUp = x[1][3:].split(',')
+        solution = x[2][3:].split(',')
+
+        pieceInSetArray = {'r' : 0, 'n': 2, 'b':4, 'q' : 6, 'k':7, 'p':8 }
+
+        bSetUpCoord = puzzleNotationToCoord(bSetUp)
+        wSetUpCoord = puzzleNotationToCoord(wSetUp)
+        print("bSetUpCoord", bSetUpCoord)
+        print("wSetUpCoord", wSetUpCoord)
 
 
+        #black Set Up
+
+        for piecePos in bSetUpCoord:
+                pieceCoord = int(piecePos[1:])
+                piece = bSet[pieceInSetArray[piecePos[0]]]
+                boardObjectSpaces[pieceCoord] = piece
+                display = bSet[pieceInSetArray[piecePos[0]]].bImage
+                board[pieceCoord].create_image(45,45,image=display)
+                bPlaces[pieceCoord] = piece 
+                pieceInSetArray[piecePos[0]] += 1
+
+        pieceInSetArray = {'r' : 0, 'n': 2, 'b':4, 'q' : 6, 'k':7, 'p':8 }      
+        
+        #white set up
+        for piecePos in wSetUpCoord:
+                pieceCoord = int(piecePos[1:])
+                piece = wSet[pieceInSetArray[piecePos[0]]]
+                boardObjectSpaces[pieceCoord] = piece
+                display = wSet[pieceInSetArray[piecePos[0]]].wImage
+                board[pieceCoord].create_image(45,45,image=display)
+                wPlaces[pieceCoord] = piece 
+                pieceInSetArray[piecePos[0]] += 1
+        print("solution: ", solution)
+        
+        
+        
+
+        return bSet,wSet,board,bPlaces,wPlaces,boardObjectSpaces,solution
 
 def setUpFromFile(bSet,wSet,board,boardObjectSpaces):
-    #opens puzzle text file and turns it into a string
-    #text_file = open("/Users/alexanderthomas/Desktop/passionProject-alexthomas/puzzle1.txt", "r")
-    text_file = open("/Users/alexanderthomas/Desktop/passionProject-alexthomas/puzzle2.txt", "r")
-    puzzle = text_file.read()
-    text_file.close()
+    global puzzle
 
     #seperates the puzzle string into arrrays containing the black pieces setup, white pieces set up and the solution
     x=puzzle.split("\n")
@@ -2120,14 +2425,17 @@ def setUpFromFile(bSet,wSet,board,boardObjectSpaces):
 
 
     #black Set Up
+
     for piecePos in bSetUpCoord:
         pieceCoord = int(piecePos[1:])
         piece = bSet[pieceInSetArray[piecePos[0]]]
         boardObjectSpaces[pieceCoord] = piece
         display = bSet[pieceInSetArray[piecePos[0]]].bImage
-        place = board[pieceCoord].create_image(45,45,image=display)
-        ########this is making a one when it should be storing an object
+        board[pieceCoord].create_image(45,45,image=display)
         bPlaces[pieceCoord] = piece 
+        pieceInSetArray[piecePos[0]] += 1
+
+    pieceInSetArray = {'r' : 0, 'n': 2, 'b':4, 'q' : 6, 'k':7, 'p':8 }      
     
     #white set up
     for piecePos in wSetUpCoord:
@@ -2135,10 +2443,13 @@ def setUpFromFile(bSet,wSet,board,boardObjectSpaces):
         piece = wSet[pieceInSetArray[piecePos[0]]]
         boardObjectSpaces[pieceCoord] = piece
         display = wSet[pieceInSetArray[piecePos[0]]].wImage
-        place = board[pieceCoord].create_image(45,45,image=display)
-        ########this is making a one when it should be storing an object
+        board[pieceCoord].create_image(45,45,image=display)
         wPlaces[pieceCoord] = piece 
+        pieceInSetArray[piecePos[0]] += 1
     print("solution: ", solution)
+    
+    
+    
 
     return bSet,wSet,board,bPlaces,wPlaces,boardObjectSpaces,solution
 
@@ -2163,10 +2474,10 @@ def pickPiece(setMove,places,origSquare):
                 playerGo = "It's black's move."
 
         #display label of who's turn it is
-        playerText = tkin.Label(root, text=playerGo)
-        playerText.grid(column=10, row=0)
+        
 
         #do this time
+        print("places in pick piece: ", places)
         for piece in places:
                 if piece != "":
                         pIndex = places.index(piece)
@@ -2174,6 +2485,8 @@ def pickPiece(setMove,places,origSquare):
                         board[pIndex].config(cursor="plus")
                         #binding click event to the Canvases
                         board[pIndex].bind("<Button-1>",lambda event: playerSelect(event,places = places))
+                        print(pIndex)
+                        
                 else:
                     #if space has no piece then loop back
                     continue
@@ -2468,9 +2781,7 @@ playerGo = "It's white's move"
 setMove = "w"
 
 #open text file with puzzle placements and solution and make it into a string
-text_file = open("/Users/alexanderthomas/Desktop/passionProject-alexthomas/puzzle2.txt", "r")
-puzzle = text_file.read()
-text_file.close()
+
 
 #DON'T CONFUSE SETS AND PLACES
 wPlaces = []
@@ -2483,12 +2794,21 @@ labelTop()
 labelSide()
 roundLabel()
 
+
+text_file = open(files[random.randint(1,3)], "r")
+puzzle = text_file.read()
+text_file.close()
+
 #main
 playerGo = playerLabel(playerGo)
 blackSquares,whiteSquares = makeBoardCanvases()
 blackSquares,whiteSquares = positionBoardCanvases(blackSquares,whiteSquares)
 board = boardSpaces(blackSquares,whiteSquares)
 bSet,wSet,board,bPlaces,wPlaces,boardObjectSpaces,solution = setUpFromFile(bSet,wSet,board,boardObjectSpaces)
+
+
+
+#print(board)
 places = pickPiece(setMove,places,origSquare=board[1])
 
 #places stores the in an array the location of the pieces on the board coordinate system
@@ -2555,162 +2875,7 @@ places = pickPiece(setMove,places,origSquare=board[1])
 print("start of game")
 root.mainloop()
 
-def autoMove():
-        print("autoMove line 2559")
-
-        #Canvases
-        oldSquareCoords = int((8-int(solution[0][3]))*8 + columnLetterToCoord[solution[0][2]])
-        newSquareCoords = int((8-int(solution[0][5]))*8 + columnLetterToCoord[solution[0][4]])
-
-        origSquare = board[oldSquareCoords]
-        newSquare = board[newSquareCoords]
-        
-       
-        
-
-        #TO DO:change so only runs if new square matches solution
-
-        print("auto newSquare: ", newSquare )
-        print("auto origSquare: ", origSquare )
-
-        #indexes
-        oldIndex = board.index(origSquare)
-        newIndex = board.index(newSquare)
-
-        
-        #objects
-        piece = boardObjectSpaces[oldIndex]
-        otherPiece = boardObjectSpaces[newIndex]
-
-        if piece != "": 
-                print("picked piece: ", piece.color, piece)
-        if otherPiece != "":
-                print("attacked piece: ", otherPiece.color, otherPiece)
-
-        #set object
-        #and get correct image
-        #and determine who's turn it is after ours by getting our color
-        if piece.color == "w":
-                ourSetPiece = wPlaces[oldIndex]
-                ourColor = "w"
-                turn = "b"
-                img = boardObjectSpaces[oldIndex].wImage
-        elif piece.color == "b":
-                ourSetPiece = bPlaces[oldIndex]
-                ourColor = "b"
-                turn = "w"
-                img = boardObjectSpaces[oldIndex].bImage
-
-        #other set object
-        if otherPiece == "":
-                pass
-        elif otherPiece.color == "w":
-                otherSetPiece = wPlaces[newIndex]
-                otherColor = "w"
-                otherImg = boardObjectSpaces[newIndex].wImage
-        elif otherPiece.color == "b":
-                otherSetPiece = bPlaces[oldIndex]
-                otherColor = "b"
-                otherImg = boardObjectSpaces[newIndex].bImage
 
 
 
         
-
-        #parameter to pass to pickPieces. Allows other player to have their turn
-        setMove = turn
-
-        # moving to new square Canvas
-        # board[newIndex].delete("all")
-        # board[newIndex].create_image(50, 50, image=img)
-
-        # need to kill opposing player and swap with same color player
-        # then switch the turns over
-        if otherPiece == "":
-                # if nothing in square
-
-                #delete from old Canvas
-                board[oldIndex].delete("all")
-                #move to new Canvas
-                board[newIndex].create_image(50, 50, image=img)
-                #move object
-                boardObjectSpaces[newIndex] = boardObjectSpaces[oldIndex]
-                #delete object from old space/give it empty space
-                boardObjectSpaces[oldIndex] = ""
-                #move set object
-        if ourColor == "w":
-                wPlaces[newIndex] = wPlaces[oldIndex]
-                wPlaces[oldIndex] = ""
-        elif ourColor == "b":
-                bPlaces[newIndex] = bPlaces[oldIndex]
-                bPlaces[oldIndex] = ""
-
-        #run pickPiece function passing in other player's color
-        #pickPiece(setMove,places)
-
-        if otherPiece != "":
-                if otherPiece.color == turn:
-                        print("kill other line 1940")
-                        # if opposing player kill it
-
-                        # otherpiece is the object
-
-                        # remove from Canvas in board
-                        board[newIndex].delete("all")
-                        # put new piece in canvas
-                        board[newIndex].create_image(50, 50, image=img)
-                        #remove killer from their previous space
-                        board[oldIndex].delete("all")
-
-                        # remove from object spaces
-                        #replace it with the player piece and put an empty string in the previous place. The otherPiece is gone
-                        boardObjectSpaces[newIndex] = piece
-                        boardObjectSpaces[oldIndex] = ""
-
-                        # remove from player set but do so by replacing it with an empty string
-                        #don't use 'remove' etc. otherwise that will remove a space and mess up its correlation to the board
-                        if turn == "w":
-                                bPlaces[newIndex] = ""
-                                # change killer's space in their set
-                                wPlaces[newIndex] = piece
-                                wPlaces[oldIndex] = ""
-                        elif turn == "b":
-                                bPlaces[newIndex] = ""
-                                # change killer's space in their set
-                                wPlaces[newIndex] = piece
-                                wPlaces[oldIndex] = ""
-
-
-                        if otherPiece.kind == "king":
-                                #if the king dies run the winlose function and end the game
-                                winLose(otherPiece)
-                        #else:
-                                #pickPiece function
-                                #pickPiece(setMove,places)
-
-                elif otherPiece.color == ourColor:
-                        # if same set piece then swap it
-
-                        # swap spaces in board Canvases
-                        #other piece
-                        board[oldIndex].delete("all")
-                        board[oldIndex].create_image(50, 50, image=otherImg)
-                        #player's piece
-                        board[newIndex].delete("all")
-                        board[newIndex].create_image(50, 50, image=img)
-
-                        # swap spaces in boardObjectSpaces
-                        boardObjectSpaces[oldIndex] = otherPiece
-                        boardObjectSpaces[newIndex] = piece
-
-                        # swap spaces in player set
-                        if ourColor == "w":
-                                wPlaces[oldIndex] = otherPiece
-                                wPlaces[newIndex] = piece
-                        elif ourColor == "b":
-                                bPlaces[oldIndex] = otherPiece
-                                bPlaces[newIndex] = piece
-
-
-        
-
