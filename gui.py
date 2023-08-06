@@ -1,5 +1,6 @@
 from ast import Nonlocal
 import tkinter as tkin
+from turtle import up, update
 import PIL
 from PIL import ImageTk
 from PIL import Image
@@ -17,7 +18,17 @@ header = tkin.Label(root,text="2D Chess",)
 header.config(font=("courier",20))
 header.grid(column=0,row=0)
 
-files = { 1:"/Users/alexanderthomas/Desktop/passionProject-alexthomas/puzzle1.txt", 2: "/Users/alexanderthomas/Desktop/passionProject-alexthomas/puzzle2.txt", 3: "/Users/alexanderthomas/Desktop/passionProject-alexthomas/puzzle3.txt" }
+files = { 1:"/Users/alexanderthomas/Desktop/passionProject-alexthomas/puzzle1.txt", 2: "/Users/alexanderthomas/Desktop/passionProject-alexthomas/puzzle2.txt", 3: "/Users/alexanderthomas/Desktop/passionProject-alexthomas/puzzle3.txt", 4: "/Users/alexanderthomas/Desktop/passionProject-alexthomas/puzzle4.txt", 5: "/Users/alexanderthomas/Desktop/passionProject-alexthomas/puzzle5.txt", 6: "/Users/alexanderthomas/Desktop/passionProject-alexthomas/puzzle2.txt", 3: "/Users/alexanderthomas/Desktop/passionProject-alexthomas/puzzle3.txt", 4: "/Users/alexanderthomas/Desktop/passionProject-alexthomas/puzzle4.txt", 5: "/Users/alexanderthomas/Desktop/passionProject-alexthomas/puzzle6.txt" }
+
+def update_player_text(new_message):
+    # Remove the current playerText label from the grid
+    playerText.grid_forget()
+
+    # Create a new playerText label with the updated message
+    playerText.config(text=new_message)
+
+    # Re-grid the playerText label to display it again
+    playerText.grid(column=9, row=0)
 
 def roundLabel():
         global moveNo
@@ -177,10 +188,13 @@ def positionBoardCanvases(blackSquares,whiteSquares):
         nextButton.create_text(text_x, text_y, text="Next Puzzle", font=("Arial", 16), fill="black")
 
         def onResetClick(event):
+                global playerText
                 x = event.x
                 y = event.y
                 print(f"Reset Clicked!")
                 resetPuzzle()
+                update_player_text("White's Move. Find the winning sequence!")
+                
 
         def onNextClick(event):
                 x = event.x
@@ -207,6 +221,8 @@ def positionBoardCanvases(blackSquares,whiteSquares):
                 wPlaces,bPlaces = fillPlaces(wPlaces,bPlaces)
                 bSet,wSet,board,bPlaces,wPlaces,boardObjectSpaces,solution = setUpFromRandomFile(bSet,wSet,board,boardObjectSpaces)
                 places = pickPiece(setMove,places,origSquare=board[1])
+                update_player_text("White's Move. Find the winning sequence!")
+                
 
         
 
@@ -1900,12 +1916,11 @@ def resetPuzzle():
 def autoMove():
         global solution
         global playerGo
+        global playerText
         print("autoMove line 2559")
 
         if len(solution) == 0:
-                playerGo = "You solved the puzzle!"
-                playerText = tkin.Label(root, text=playerGo)
-                playerText.grid(column=9, row=0)
+                update_player_text("You solved the puzzle!")
                 return
 
         #Canvases
@@ -2293,10 +2308,7 @@ def doMove(event,origSquare,possibleMoves):
                 if len(solution) == 0:
                         return
         else:
-                playerGo = "Wrong move. Try again!"
-                playerText = tkin.Label(root, text=playerGo)
-                playerText.grid(column=9, row=0)
-                resetPuzzle()
+                update_player_text("Wrong move. Try again?")
 
 
         #change round label
@@ -2358,7 +2370,7 @@ def puzzleNotationToCoord(puzzleNotationList):
 
 def setUpFromRandomFile(bSet,wSet,board,boardObjectSpaces):
         global puzzle
-        randNum = random.randint(1, 3)
+        randNum = random.randint(1, len(files))
         text_file = open(files[randNum], "r")
         print(text_file)
         puzzle = text_file.read()
@@ -2777,7 +2789,9 @@ def fillPlaces(wPlaces,bPlaces):
         
 #TRACKERS        
 moveNo = 0
-playerGo = "It's white's move"
+playerGo = "White's Move. Find the winning sequence!"
+playerText = tkin.Label(root, text=playerGo)
+playerText.grid(column=9, row=0)
 setMove = "w"
 
 #open text file with puzzle placements and solution and make it into a string
@@ -2795,7 +2809,7 @@ labelSide()
 roundLabel()
 
 
-text_file = open(files[random.randint(1,3)], "r")
+text_file = open(files[random.randint(1,len(files))], "r")
 puzzle = text_file.read()
 text_file.close()
 

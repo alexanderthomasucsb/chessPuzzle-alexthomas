@@ -1,3 +1,3 @@
 b: kb8,pb7,pf3,nf2,bg2,ra1
-w: kc3,pd4,kf6,bf8,rg8,ph2
-s: wbf8d6
+w: kc3,pd4,ne6,bf8,rg8,ph2
+s: wbf8c5

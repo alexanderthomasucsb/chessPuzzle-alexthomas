@@ -1,0 +1,3 @@
+b: kg5,pb7
+w: ke4,pc5
+s: wke4e5,bkg5g4,wke5d6,bkg4f4,wkd6c7,bkf4e3,wkc7b7

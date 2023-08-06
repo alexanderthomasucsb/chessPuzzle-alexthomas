@@ -1,0 +1,3 @@
+b: kg8,pa7,pf7,pg7,ph6,qb4,bh3,rd1
+w: pb5,pa4,pf4,pg3,re2,qf2,ph2,bf1,kg1
+s: wre2e8,bkg8h7,wqf2c2,bpf7f5,wqc2d1
