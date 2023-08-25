@@ -18,7 +18,7 @@ header = tkin.Label(root,text="2D Chess",)
 header.config(font=("courier",20))
 header.grid(column=0,row=0)
 
-files = { 1:"/Users/alexanderthomas/Desktop/passionProject-alexthomas/puzzle1.txt", 2: "/Users/alexanderthomas/Desktop/passionProject-alexthomas/puzzle2.txt", 3: "/Users/alexanderthomas/Desktop/passionProject-alexthomas/puzzle3.txt", 4: "/Users/alexanderthomas/Desktop/passionProject-alexthomas/puzzle4.txt", 5: "/Users/alexanderthomas/Desktop/passionProject-alexthomas/puzzle5.txt", 6: "/Users/alexanderthomas/Desktop/passionProject-alexthomas/puzzle2.txt", 3: "/Users/alexanderthomas/Desktop/passionProject-alexthomas/puzzle3.txt", 4: "/Users/alexanderthomas/Desktop/passionProject-alexthomas/puzzle4.txt", 5: "/Users/alexanderthomas/Desktop/passionProject-alexthomas/puzzle6.txt" }
+files = { 1:"mats/puzzle1.txt", 2: "mats/puzzle2.txt", 3: "mats/puzzle3.txt", 4: "mats/puzzle4.txt", 5: "mats/puzzle5.txt", 6: "mats/puzzle2.txt" }
 
 def update_player_text(new_message):
     # Remove the current playerText label from the grid
@@ -347,12 +347,11 @@ class Piece(object):
         def unbindAll(self):
                 pass
 
-script_dir = "/Users/alexanderthomas/Desktop/passionProject-alexthomas/"
 class Pawn(Piece):
         #properties
-        bOpen= Image.open(os.path.join(script_dir,"mats/bPawn.png"))
+        bOpen= Image.open("mats/bPawn.png")
         bImage= ImageTk.PhotoImage(bOpen)
-        wOpen= Image.open(os.path.join(script_dir,"mats/wPawn.png"))
+        wOpen= Image.open("mats/wPawn.png")
         wImage= ImageTk.PhotoImage(wOpen)
 
         kind = "pawn"
@@ -510,9 +509,9 @@ class Pawn(Piece):
 
 class Knight(Piece):
         #properties
-        bOpen= Image.open(os.path.join(script_dir,"mats/bKnight.png"))
+        bOpen= Image.open("mats/bKnight.png")
         bImage= ImageTk.PhotoImage(bOpen)
-        wOpen= Image.open(os.path.join(script_dir,"mats/wKnight.png"))
+        wOpen= Image.open("mats/wKnight.png")
         wImage= ImageTk.PhotoImage(wOpen)
 
         kind = "knight"
@@ -696,9 +695,9 @@ class Knight(Piece):
 
 class Rook(Piece):
         #properties
-        bOpen= Image.open(os.path.join(script_dir,"mats/bRook.png"))
+        bOpen= Image.open("mats/bRook.png")
         bImage= ImageTk.PhotoImage(bOpen)
-        wOpen= Image.open(os.path.join(script_dir,"mats/wRook.png"))
+        wOpen= Image.open("mats/wRook.png")
         wImage= ImageTk.PhotoImage(wOpen)
 
         kind = "rook"
@@ -934,9 +933,9 @@ class Rook(Piece):
 
 class Bishop(Piece):
         #properties
-        bOpen= Image.open(os.path.join(script_dir,"mats/bBishop.png"))
+        bOpen= Image.open("mats/bBishop.png")
         bImage= ImageTk.PhotoImage(bOpen)
-        wOpen= Image.open(os.path.join(script_dir,"mats/wBishop.png"))
+        wOpen= Image.open("mats/wBishop.png")
         wImage= ImageTk.PhotoImage(wOpen)
 
         kind = "bishop"
@@ -1206,9 +1205,9 @@ class Bishop(Piece):
         
 class Queen(Piece):
         #properties
-        bOpen= Image.open(os.path.join(script_dir,"mats/bQueen.png"))
+        bOpen= Image.open("mats/bQueen.png")
         bImage= ImageTk.PhotoImage(bOpen)
-        wOpen= Image.open(os.path.join(script_dir,"mats/wQueen.png"))
+        wOpen= Image.open("mats/wQueen.png")
         wImage= ImageTk.PhotoImage(wOpen)
 
         kind = "queen"
@@ -1714,9 +1713,9 @@ class Queen(Piece):
 
 class King(Piece):
         #properties
-        bOpen= Image.open(os.path.join(script_dir,"mats/bKing.png"))
+        bOpen= Image.open("mats/bKing.png")
         bImage= ImageTk.PhotoImage(bOpen)
-        wOpen= Image.open(os.path.join(script_dir,"mats/wKing.png"))
+        wOpen= Image.open("mats/wKing.png")
         wImage= ImageTk.PhotoImage(wOpen)
 
         kind = "king"
